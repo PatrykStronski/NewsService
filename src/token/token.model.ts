@@ -4,7 +4,6 @@ export interface IToken {
 }
 
 export interface IPayload {
-    user: string;
     email: string;
     role: string;
 }

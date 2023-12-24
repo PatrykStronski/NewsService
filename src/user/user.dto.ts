@@ -1,3 +1,4 @@
+import { UserRole, UserStatus } from "@prisma/client";
 import { IsEmail, IsPhoneNumber, IsString } from "class-validator";
 
 export class UserInput {
@@ -5,11 +6,16 @@ export class UserInput {
     email: string;
 
     @IsPhoneNumber()
-    phone: String
+    phone: string
 
     @IsString()
-    password: String
+    password: string
 
     @IsString()
-    role: string;
+    role: UserRole;
+
+    @IsString()
+    status: UserStatus;
+
+    salt?: string;    
 }

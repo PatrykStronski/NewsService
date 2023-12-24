@@ -6,10 +6,12 @@ import { UserController } from './user/user.controller';
 import { NewsController } from './news/news.controller';
 import { TokenService } from './token/token.service';
 import { PrismaService } from './prisma.service';
+import { UserService } from './user/user.service';
+import { CodesService } from './codes/codes.service';
 
 @Module({
   imports: [],
   controllers: [AppController, AuthController, UserController, NewsController],
-  providers: [AppService, TokenService, PrismaService],
+  providers: [AppService, TokenService, PrismaService, UserService, CodesService],
 })
 export class AppModule {}

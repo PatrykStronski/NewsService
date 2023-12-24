@@ -3,6 +3,8 @@ import { genSalt, hash, compare } from 'bcrypt';
 import { AuthBodyDto } from "src/auth/auth.dto";
 import { UserInput } from "./user.dto";
 import { PrismaService } from "src/prisma.service";
+import { User } from "@prisma/client";
+import { IPayload, IToken } from "src/token/token.model";
 
 const MAX_PAGE_SIZE = 10;
 
@@ -33,7 +35,7 @@ export class UserService {
       data.password = await hash(data.password, salt)
       data.salt = salt;
       return this.prisma.user.create({
-        data,
+        data: data as User,
       });
     } catch (e) {
       console.error(e)
@@ -41,7 +43,7 @@ export class UserService {
     }
   }
 
-  async authorizeUser(authData: AuthBodyDto): Promise<IToken> {
+  async authorizeUser(authData: AuthBodyDto): Promise<IPayload> {
     const userData = await this.prisma.user.findUnique({
       where: {
         email: authData.email
@@ -52,11 +54,37 @@ export class UserService {
     }
     const res = await compare(authData.password, userData.password);
     if (res) return {
-      userId: userData.id,
-      name: userData.name,
       email: userData.email,
       role: userData.role
     }
     else throw new UnauthorizedException({message: 'Wrong user or password'});
+  }
+
+  async getUserByMail(email: string): Promise<IPayload> {
+    const userData = await this.prisma.user.findUnique({
+      where: {
+        email
+      }
+    });
+    if (!userData) {
+      throw new UnauthorizedException({message: 'Wrong user or password'})
+    }
+    return {
+      email: userData.email,
+      role: userData.role
+    }
+  }
+
+  async createAdmin(admin: UserInput) {
+    const salt = await genSalt(8);
+    admin.password = await hash(admin.password, salt)
+    admin.salt = salt;
+    await this.prisma.user.upsert({
+      where: {
+        email: admin.email
+      },
+      create: admin as User,
+      update: admin
+    })
   }
 }
