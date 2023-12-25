@@ -1,3 +1,6 @@
+#keys
+/src/keys
+
 # compiled output
 /dist
 /node_modules
