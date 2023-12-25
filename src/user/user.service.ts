@@ -1,12 +1,21 @@
 import { BadRequestException, Injectable, UnauthorizedException } from "@nestjs/common";
 import { genSalt, hash, compare } from 'bcrypt';
 import { AuthBodyDto } from "src/auth/auth.dto";
-import { UserInput } from "./user.dto";
+import { UserInput, UserRoleEdit } from "./user.dto";
 import { PrismaService } from "src/prisma.service";
 import { User } from "@prisma/client";
-import { IPayload, IToken } from "src/token/token.model";
+import { IPayload } from "src/token/token.model";
 
 const MAX_PAGE_SIZE = 10;
+const USER_FIELDS_DISPLAY = {
+  id: true,
+  email: true, 
+  phone: true,
+  role: true, 
+  status: true,
+  salt: false,
+  password: false
+};
 
 @Injectable()
 export class UserService {
@@ -16,25 +25,36 @@ export class UserService {
     id: number,
   ): Promise<User | null> {
     return this.prisma.user.findUnique({
+      select: USER_FIELDS_DISPLAY,
       where: {
         id
       },
     });
   }
 
-  async users(cursor = 0, take = MAX_PAGE_SIZE): Promise<User[]> {
+  async users(cursor = 1, take = MAX_PAGE_SIZE): Promise<User[]> {
     return this.prisma.user.findMany({
+      select: USER_FIELDS_DISPLAY,
       cursor: {id: cursor},
       take
     });
   }
 
   async createUser(data: UserInput): Promise<User> {
+    const existing = await this.prisma.user.findFirst({
+      where: {
+        OR: [
+        { email: data.email },
+        { phone: data.phone }
+        ]
+      }
+    });
+    if (existing) throw new BadRequestException(`User already exists with ${data.email} or phone ${data.phone}`);
     try {
       const salt = await genSalt(8);
       data.password = await hash(data.password, salt)
       data.salt = salt;
-      return this.prisma.user.create({
+      return await this.prisma.user.create({
         data: data as User,
       });
     } catch (e) {
@@ -74,6 +94,23 @@ export class UserService {
       email: userData.email,
       role: userData.role
     }
+  }
+
+  async changeUserRole(body: UserRoleEdit) {
+    return await this.prisma.user.update({
+      where: {
+        email: body.email
+      },
+      data: {
+        role: body.role
+      }
+    })
+  }
+
+  async deleteUser(id: number) {
+    return await this.prisma.user.delete({
+      where: { id }
+    })
   }
 
   async createAdmin(admin: UserInput) {

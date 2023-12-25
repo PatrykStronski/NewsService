@@ -5,6 +5,7 @@ import { PrismaService } from 'src/prisma.service';
 
 const MAX_OTPS_PER_USER = 5;
 const CODE_VALIDITY_SECONDS = 120;
+const MAX_CODE_CREATION_TRIAL = 5; 
 
 @Injectable()
 export class CodesService {
@@ -22,13 +23,25 @@ export class CodesService {
         if (codes.length > MAX_OTPS_PER_USER) {
             throw new ForbiddenException('Too many codes queries, try again later');
         }
-        await this.prisma.otp.create({
-            data: {
-                userId,
-                code,
-                expiresAt: moment().add(CODE_VALIDITY_SECONDS, 'seconds').toDate()
+
+        let codeEntity = null;
+        let codeCreationTrials = 0;
+
+        while (!codeEntity && codeCreationTrials < MAX_CODE_CREATION_TRIAL) {
+            try {
+            codeEntity = await this.prisma.otp.create({
+                data: {
+                    userId,
+                    code,
+                    expiresAt: moment().add(CODE_VALIDITY_SECONDS, 'seconds').toDate()
+                }
+            })
+            } catch(error) {
+                console.error(error);
+                codeEntity = null;
             }
-        })
+            codeCreationTrials++;
+        }
         return code;
     }
 
