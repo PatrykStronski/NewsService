@@ -52,8 +52,6 @@ model Otp {
   id        String   @id @default(uuid())
   user     User     @relation(fields: [userId], references: [id])
   userId    Int
-  code      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  code      Int
   expiresAt DateTime @db.Timestamp(5)
 }

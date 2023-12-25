@@ -21,3 +21,11 @@ export class TokenBodyDto {
     @IsString()
     password: string;
 }
+
+export class RefreshBodyDto {
+    @IsEmail()
+    email: string;
+
+    @IsString()
+    refresh: string;
+}

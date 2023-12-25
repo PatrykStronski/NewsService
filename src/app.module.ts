@@ -8,9 +8,12 @@ import { TokenService } from './token/token.service';
 import { PrismaService } from './prisma.service';
 import { UserService } from './user/user.service';
 import { CodesService } from './codes/codes.service';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
-  imports: [],
+  imports: [
+    ScheduleModule.forRoot()
+  ],
   controllers: [AppController, AuthController, UserController, NewsController],
   providers: [AppService, TokenService, PrismaService, UserService, CodesService],
 })

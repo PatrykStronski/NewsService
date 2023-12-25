@@ -54,6 +54,7 @@ export class UserService {
     }
     const res = await compare(authData.password, userData.password);
     if (res) return {
+      id: userData.id,
       email: userData.email,
       role: userData.role
     }

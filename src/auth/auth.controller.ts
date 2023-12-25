@@ -2,7 +2,7 @@ import { Body, Controller, Post, UnauthorizedException } from '@nestjs/common';
 import { IToken } from 'src/token/token.model'
 import { UserService } from 'src/user/user.service';
 import { TokenService } from 'src/token/token.service';
-import { AuthBodyDto, TokenBodyDto } from './auth.dto';
+import { AuthBodyDto, RefreshBodyDto, TokenBodyDto } from './auth.dto';
 import { CodesService } from 'src/codes/codes.service';
 
 @Controller('auth')
@@ -11,13 +11,19 @@ export class AuthController {
 
     @Post('auth')
     async auth(@Body() body: AuthBodyDto) {
-        await this.userService.authorizeUser(body);
-        return this.codesService.generateCode();
+        const user = await this.userService.authorizeUser(body);
+        return this.codesService.getCodeForUser(user.id);
     }
 
     @Post('token')
     async token(@Body() body: TokenBodyDto): Promise<IToken> {
         const payload = await this.userService.getUserByMail(body.email);
+        await this.codesService.popCode(body.email, body.code);
         return this.tokenService.createTokens(payload)
+    }
+
+    @Post('refresh')
+    async refresh(@Body() body: RefreshBodyDto): Promise<IToken> {
+        return this.tokenService.refreshToken(body.refresh, body.email)
     }
 }
