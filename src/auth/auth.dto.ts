@@ -14,6 +14,9 @@ export class TokenBodyDto {
     
     @IsNumber()
     code: number;
+
+    @IsString()
+    password: string;
 }
 
 export class RefreshBodyDto {

@@ -18,7 +18,7 @@ export class AuthController {
 
     @Post('token')
     async token(@Body() body: TokenBodyDto): Promise<IToken> {
-        const payload = await this.userService.getUserByMail(body.email);
+        const payload = await this.userService.authorizeUser(body);
         await this.codesService.popCode(body.email, body.code);
         return this.tokenService.createTokens(payload)
     }
