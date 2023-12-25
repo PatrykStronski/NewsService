@@ -11,7 +11,11 @@ const MAX_CODE_CREATION_TRIAL = 5;
 export class CodesService {
     constructor(private prisma: PrismaService) { }
     generateCode(): number {
-        return Math.floor(Math.random() * 1000000);
+        let code = 0;
+        while (code < 99999 || code > 1000000) {
+            code = Math.floor(Math.random() * 1000000);
+        }
+        return code;
     }
 
     async getCodeForUser(userId: number): Promise<number> {

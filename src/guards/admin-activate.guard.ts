@@ -16,10 +16,10 @@ export class AdminActivateGuard implements CanActivate {
         const request = context.switchToHttp().getRequest();
         const token = this.tokenService.extractTokenFromHeader(request);
         if (!token) {
-            throw new UnauthorizedException();
+            throw new UnauthorizedException('User does not have enough rights');
         }
         const payload = await this.tokenService.verifyToken(token) as IPayload;
-        if (payload.role !== UserRole.admin) return false;
+        if (payload.role !== UserRole.admin) throw new UnauthorizedException('User Does not have enough rights');
         request['user'] = payload;
         return true;
     }

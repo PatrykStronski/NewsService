@@ -12,14 +12,8 @@ export class TokenBodyDto {
     @IsEmail()
     email: string;
     
-    @IsString()
-    refresh: string;
-
     @IsNumber()
     code: number;
-
-    @IsString()
-    password: string;
 }
 
 export class RefreshBodyDto {

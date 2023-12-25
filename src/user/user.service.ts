@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, Injectable, UnauthorizedException } from "@nestjs/common";
+import { BadRequestException, ForbiddenException, HttpException, HttpStatus, Injectable, UnauthorizedException } from "@nestjs/common";
 import { genSalt, hash, compare } from 'bcrypt';
 import { AuthBodyDto } from "src/auth/auth.dto";
 import { UserInput, UserRoleEdit, UserStatusEdit } from "./user.dto";
@@ -9,9 +9,9 @@ import { IPayload } from "src/token/token.model";
 const MAX_PAGE_SIZE = 10;
 const USER_FIELDS_DISPLAY = {
   id: true,
-  email: true, 
+  email: true,
   phone: true,
-  role: true, 
+  role: true,
   status: true,
   salt: false,
   password: false
@@ -19,7 +19,7 @@ const USER_FIELDS_DISPLAY = {
 
 @Injectable()
 export class UserService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async user(
     id: number,
@@ -35,7 +35,7 @@ export class UserService {
   async users(cursor = 1, take = MAX_PAGE_SIZE): Promise<User[]> {
     return this.prisma.user.findMany({
       select: USER_FIELDS_DISPLAY,
-      cursor: {id: cursor},
+      cursor: { id: cursor },
       take
     });
   }
@@ -44,8 +44,8 @@ export class UserService {
     const existing = await this.prisma.user.findFirst({
       where: {
         OR: [
-        { email: data.email },
-        { phone: data.phone }
+          { email: data.email },
+          { phone: data.phone }
         ]
       }
     });
@@ -70,7 +70,7 @@ export class UserService {
       }
     });
     if (!userData) {
-      throw new UnauthorizedException({message: 'Wrong user or password'})
+      throw new UnauthorizedException({ message: 'Wrong user or password' })
     }
     if (userData.status === UserStatus.blocked) {
       throw new ForbiddenException('The user has been blocked! Contact administrator');
@@ -81,7 +81,7 @@ export class UserService {
       email: userData.email,
       role: userData.role
     }
-    else throw new UnauthorizedException({message: 'Wrong user or password'});
+    else throw new UnauthorizedException({ message: 'Wrong user or password' });
   }
 
   async getUserByMail(email: string): Promise<IPayload> {
@@ -91,40 +91,59 @@ export class UserService {
       }
     });
     if (!userData) {
-      throw new UnauthorizedException({message: 'Wrong user or password'})
+      throw new UnauthorizedException({ message: 'Wrong user or password' })
     }
     return {
+      id: userData.id,
       email: userData.email,
       role: userData.role
     }
   }
 
   async changeUserRole(body: UserRoleEdit) {
-    return await this.prisma.user.update({
-      where: {
-        email: body.email
-      },
-      data: {
-        role: body.role
-      }
-    })
+    try {
+      return await this.prisma.user.update({
+        select: USER_FIELDS_DISPLAY,
+        where: {
+          email: body.email
+        },
+        data: {
+          role: body.role
+        }
+      })
+    } catch (e) {
+      if (e.code === 'P2025') throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      throw e;
+    }
   }
 
   async changeUserStatus(body: UserStatusEdit) {
-    return await this.prisma.user.update({
-      where: {
-        email: body.email
-      },
-      data: {
-        status: body.status
-      }
-    })
+    try {
+      return await this.prisma.user.update({
+        select: USER_FIELDS_DISPLAY,
+        where: {
+          email: body.email
+        },
+        data: {
+          status: body.status
+        }
+      })
+    } catch (e) {
+      if (e.code === 'P2025') throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      throw e;
+    }
   }
 
   async deleteUser(id: number) {
-    return await this.prisma.user.delete({
-      where: { id }
-    })
+    try {
+      return await this.prisma.user.delete({
+        select: USER_FIELDS_DISPLAY,
+        where: { id }
+      })
+    } catch (e) {
+      if (e.code === 'P2025') throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      throw e;
+    }
   }
 
   async createAdmin(admin: UserInput) {

@@ -1,4 +1,5 @@
 import {
+    BadRequestException,
     CanActivate,
     ExecutionContext,
     Injectable,
@@ -16,10 +17,10 @@ export class ModeratorActivateGuard implements CanActivate {
         const request = context.switchToHttp().getRequest();
         const token = this.tokenService.extractTokenFromHeader(request);
         if (!token) {
-            throw new UnauthorizedException();
+            throw new BadRequestException('No Token Given');
         }
         const payload = await this.tokenService.verifyToken(token) as IPayload;
-        if (payload.role === UserRole.user) return false;
+        if (payload.role === UserRole.user) throw new UnauthorizedException('User Does not have enough rights');
         request['user'] = payload;
         return true;
     }

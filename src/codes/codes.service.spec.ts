@@ -12,7 +12,10 @@ describe('CodesService', () => {
     service = module.get<CodesService>(CodesService);
   });
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
+  it('Check code', () => {
+    const code = service.generateCode();
+    expect(code).toBeDefined();
+    expect(code).toBeGreaterThan(99999);
+    expect(code).toBeLessThan(1000000);
   });
 });

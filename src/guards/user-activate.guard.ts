@@ -15,7 +15,7 @@ export class UserActivateGuard implements CanActivate {
         const request = context.switchToHttp().getRequest();
         const token = this.tokenService.extractTokenFromHeader(request);
         if (!token) {
-            throw new UnauthorizedException();
+            throw new UnauthorizedException('User does not have enough rights');
         }
         const payload = await this.tokenService.verifyToken(token) as IPayload;
         request['user'] = payload;

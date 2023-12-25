@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, ExecutionContext, Get, HttpCode, HttpException, HttpStatus, Param, Patch, Post, Put, UseGuards, createParamDecorator } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpException, HttpStatus, Param, Patch, Put, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { PaginationInput, UserInput, UserRoleEdit, UserStatusEdit } from './user.dto';
 import { AdminActivateGuard } from 'src/guards/admin-activate.guard';
@@ -52,8 +52,6 @@ export class UserController {
     @Delete(':userId')
     @UseGuards(AdminActivateGuard)
     async delete(@Param() param: { userId: string}){
-        const user = await this.userService.deleteUser(parseInt(param.userId));
-        if (!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND);
-        return user;
+        return await this.userService.deleteUser(parseInt(param.userId));
     }
 }

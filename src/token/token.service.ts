@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { readFileSync } from 'fs';
 import * as jwt from 'jsonwebtoken';
 import { Request } from 'express';
@@ -59,5 +59,15 @@ export class TokenService {
     extractTokenFromHeader(request: Request): string | undefined {
         const [type, token] = request.headers.authorization?.split(' ') ?? [];
         return type === 'Bearer' ? token : undefined;
+    }
+
+    extractUserIdFromToken(token: string): number {
+        try {
+            const payload: IPayload = jwt.decode(token);
+            return payload.id
+        } catch (e) {
+            console.error(e)
+            throw new BadRequestException('Invalid token');
+        }
     }
 }
