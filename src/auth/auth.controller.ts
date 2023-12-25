@@ -12,7 +12,8 @@ export class AuthController {
     @Post('auth')
     async auth(@Body() body: AuthBodyDto) {
         const user = await this.userService.authorizeUser(body);
-        return this.codesService.getCodeForUser(user.id);
+        const code = await this.codesService.getCodeForUser(user.id);
+        console.log({code, user: body.email});
     }
 
     @Post('token')

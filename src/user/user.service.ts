@@ -1,9 +1,9 @@
-import { BadRequestException, Injectable, UnauthorizedException } from "@nestjs/common";
+import { BadRequestException, ForbiddenException, Injectable, UnauthorizedException } from "@nestjs/common";
 import { genSalt, hash, compare } from 'bcrypt';
 import { AuthBodyDto } from "src/auth/auth.dto";
-import { UserInput, UserRoleEdit } from "./user.dto";
+import { UserInput, UserRoleEdit, UserStatusEdit } from "./user.dto";
 import { PrismaService } from "src/prisma.service";
-import { User } from "@prisma/client";
+import { User, UserStatus } from "@prisma/client";
 import { IPayload } from "src/token/token.model";
 
 const MAX_PAGE_SIZE = 10;
@@ -72,6 +72,9 @@ export class UserService {
     if (!userData) {
       throw new UnauthorizedException({message: 'Wrong user or password'})
     }
+    if (userData.status === UserStatus.blocked) {
+      throw new ForbiddenException('The user has been blocked! Contact administrator');
+    }
     const res = await compare(authData.password, userData.password);
     if (res) return {
       id: userData.id,
@@ -103,6 +106,17 @@ export class UserService {
       },
       data: {
         role: body.role
+      }
+    })
+  }
+
+  async changeUserStatus(body: UserStatusEdit) {
+    return await this.prisma.user.update({
+      where: {
+        email: body.email
+      },
+      data: {
+        status: body.status
       }
     })
   }

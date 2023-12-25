@@ -1,16 +1,7 @@
 import { Body, Controller, Delete, ExecutionContext, Get, HttpCode, HttpException, HttpStatus, Param, Patch, Post, Put, UseGuards, createParamDecorator } from '@nestjs/common';
 import { UserService } from './user.service';
-import { PaginationInput, UserInput, UserRoleEdit } from './user.dto';
+import { PaginationInput, UserInput, UserRoleEdit, UserStatusEdit } from './user.dto';
 import { AdminActivateGuard } from 'src/guards/admin-activate.guard';
-import { UserActivateGuard } from 'src/guards/user-activate.guard';
-import { NotFoundError } from 'rxjs';
-
-export const UserId = createParamDecorator(
-    (data: unknown, ctx: ExecutionContext) => {
-        const request = ctx.switchToHttp().getRequest()
-        return request.user.userId;
-    },
-);
 
 @Controller('user')
 export class UserController {
@@ -24,6 +15,7 @@ export class UserController {
      */
     @Put()
     @HttpCode(202)
+    @UseGuards(AdminActivateGuard)
     async newUser(@Body() body: UserInput){
         const createdUser = await this.userService.createUser(body);
         delete createdUser.password;
@@ -31,7 +23,7 @@ export class UserController {
         return createdUser;
     }
 
-    @Get('/user/:userId')
+    @Get(':userId')
     @UseGuards(AdminActivateGuard)
     async getUser(@Param() param: { userId: string}){ 
         const user = await this.userService.user(parseInt(param.userId));
@@ -39,7 +31,7 @@ export class UserController {
         return user;
     }
     
-    @Get('users')
+    @Get('')
     @UseGuards(AdminActivateGuard)
     async getAllUsers(@Body() pagination: PaginationInput){
        return await this.userService.users(pagination.cursor, pagination.take); 
@@ -49,6 +41,12 @@ export class UserController {
     @UseGuards(AdminActivateGuard)
     async editRole(@Body() roleData: UserRoleEdit){
         return await this.userService.changeUserRole(roleData);
+    }
+
+    @Patch('userStatus')
+    @UseGuards(AdminActivateGuard)
+    async editStatus(@Body() statusData: UserStatusEdit) {
+        return await this.userService.changeUserStatus(statusData);
     }
 
     @Delete(':userId')

@@ -1,5 +1,5 @@
 import { UserRole, UserStatus } from "@prisma/client";
-import { IsEmail, IsEnum, IsPhoneNumber, IsPositive, IsString } from "class-validator";
+import { IsEmail, IsEnum, IsOptional, IsPhoneNumber, IsPositive, IsString } from "class-validator";
 
 export class UserInput {
     @IsEmail()
@@ -26,10 +26,20 @@ export class UserRoleEdit {
     role: UserRole;
 }
 
+export class UserStatusEdit {
+    @IsEmail()
+    email: string;
+
+    @IsEnum(UserStatus)
+    status: UserStatus;
+}
+
 export class PaginationInput {
     @IsPositive()
+    @IsOptional()
     cursor?: number;
 
     @IsPositive()
+    @IsOptional()
     take?: number;
 }

@@ -33,16 +33,15 @@ model User {
   salt String
   role UserRole
   status UserStatus @default(active)
-  news NewsEnt[]
+  news News[]
   code Otp[]
 }
 
-model NewsEnt {
+model News {
   id        Int      @default(autoincrement()) @id
   title     String
   cover String
   description String
-  content   String?
   status NewsStatus
   author    User?    @relation(fields: [authorId], references: [id])
   authorId  Int?
