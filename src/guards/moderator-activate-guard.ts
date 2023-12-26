@@ -9,6 +9,9 @@ import { TokenService } from '../token/token.service';
 import { UserRole } from '@prisma/client';
 import { IPayload } from 'src/token/token.model';
 
+/**
+ * @description Проверяет является ли пользователь запрашивающий доступ к ресурсу администратором или модератором
+ */
 @Injectable()
 export class ModeratorActivateGuard implements CanActivate {
     constructor(private tokenService: TokenService) { }

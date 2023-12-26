@@ -9,6 +9,11 @@ import { CodesService } from 'src/codes/codes.service';
 export class AuthController {
     constructor(private userService: UserService, private tokenService: TokenService, private codesService: CodesService) {}
 
+    /**
+     * 
+     * @param body в формате { email, password }, используется для автентификации пользователя 
+     * @returns только 200 код, и герирует код для авторизации, который система пишет в терминале. Он позже используется для получения токена
+     */
     @Post('auth')
     async auth(@Body() body: AuthBodyDto) {
         const user = await this.userService.authorizeUser(body);
@@ -16,6 +21,11 @@ export class AuthController {
         console.log({code, user: body.email});
     }
 
+    /**
+     * 
+     * @param body в формате { email, password, code }, используется для получения токена после его генерирования
+     * @returns два токена, обновления (refresh) и доступа (обычный)
+     */
     @Post('token')
     async token(@Body() body: TokenBodyDto): Promise<IToken> {
         const payload = await this.userService.authorizeUser(body);
@@ -23,6 +33,11 @@ export class AuthController {
         return this.tokenService.createTokens(payload)
     }
 
+    /**
+     * 
+     * @param body в формате { refresh, email } чтобы  получинть новый токен используя токен обновленя 
+     * @returns возвращвет новый токен достуна
+     */
     @Post('refresh')
     async refresh(@Body() body: RefreshBodyDto): Promise<IToken> {
         return this.tokenService.refreshToken(body.refresh, body.email)

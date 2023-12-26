@@ -10,6 +10,12 @@ import { TokenService } from 'src/token/token.service';
 export class NewsController {
     constructor(private newsService: NewsService, private tokenService: TokenService) {}
 
+    /**
+     * 
+     * @param news содерживает в себе информацию про новость которая будет создана
+     * @param request это объект запроса из которого выделяется АйДишник пользователя
+     * @returns созданный объект
+     */
     @Put()
     @HttpCode(202)
     @UseGuards(ModeratorActivateGuard)
@@ -19,24 +25,46 @@ export class NewsController {
         return await this.newsService.createNews(news, userId);
     }
 
+    /**
+     * 
+     * @param pagination необязательный объект пагинации 
+     * @returns массив пользователей
+     */
     @Get()
     @UseGuards(UserActivateGuard)
     async getAllNews(@Body() pagination: NewsPagination) {
         return this.newsService.getNews(pagination);
     }
     
+    /**
+     * 
+     * @param param параметр определяющий айдищник новости которую хочется получить
+     * @returns новость по айдишнику
+     */
     @Get(':newsId')
     @UseGuards(UserActivateGuard)
     async getNewsById(@Param() param: { newsId: string}) {
         return this.newsService.getNewsById(parseInt(param.newsId));
     }
 
+    /**
+     * 
+     * @param param параметр определяющий айдищник новости которую хочется модифицировать
+     * @body modification объект содержающий модификации для новости. Все его ключи необязательны
+     * @returns модифицированную новость
+     */
     @Patch(':newsId')
     @UseGuards(ModeratorActivateGuard)
     async modifyPost(@Body() modification: NewsModificationDto, @Param() param: { newsId: string}) {
         return this.newsService.modifyNews(parseInt(param.newsId), modification);
     }
 
+
+    /**
+     * 
+     * @param param параметр определяющий айдищник новости которую хочется удалить
+     * @returns новость которая была удаленной 
+     */
     @Delete(':newsId')
     @UseGuards(ModeratorActivateGuard)
     async deletePost(@Param() param: { newsId: string}) {

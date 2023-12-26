@@ -7,6 +7,9 @@ import {
 import { TokenService } from '../token/token.service';
 import { IPayload } from 'src/token/token.model';
 
+/**
+ * @description Проверяет является ли токен пользователя запрашивающиего доступ правильным и дейстительным
+ */
 @Injectable()
 export class UserActivateGuard implements CanActivate {
     constructor(private tokenService: TokenService) { }

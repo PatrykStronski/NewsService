@@ -9,9 +9,9 @@ export class UserController {
 
     /**
      * 
-     * @param body describes what user needs to be created
-     * @returns user created adn 202 code
-     * @description provides probability for the user to register
+     * @param body описывает пользователя который будет создан
+     * @returns созданного пользователя
+     * @description решистрирует пользователей админом
      */
     @Put()
     @HttpCode(202)
@@ -23,6 +23,11 @@ export class UserController {
         return createdUser;
     }
 
+    /**
+     * 
+     * @param param айдишник пользователя которого хочется найти
+     * @returns объект с пользователем 
+     */
     @Get(':userId')
     @UseGuards(AdminActivateGuard)
     async getUser(@Param() param: { userId: string}){ 
@@ -31,24 +36,44 @@ export class UserController {
         return user;
     }
     
+    /**
+     * 
+     * @param pagination описывает курсорную пагинацию 
+     * @returns массив пользователей
+     */
     @Get('')
     @UseGuards(AdminActivateGuard)
     async getAllUsers(@Body() pagination: PaginationInput){
        return await this.userService.users(pagination.cursor, pagination.take); 
     }
 
+    /**
+     * 
+     * @param roleData в формате { role, email}, содерживает информацию по поводу новой роли для пользователя 
+     * @returns объект с пользователем с новой ролью 
+     */
     @Patch('editRole')
     @UseGuards(AdminActivateGuard)
     async editRole(@Body() roleData: UserRoleEdit){
         return await this.userService.changeUserRole(roleData);
     }
 
+    /**
+     * 
+     * @param roleData в формате { role, email}, содерживает информацию по поводу нового статуса для пользователя 
+     * @returns объект с пользователем с новым статусом 
+     */
     @Patch('userStatus')
     @UseGuards(AdminActivateGuard)
     async editStatus(@Body() statusData: UserStatusEdit) {
         return await this.userService.changeUserStatus(statusData);
     }
 
+    /**
+     * 
+     * @param param айдишник пользователя которого хочется удалить
+     * @returns объект с пользователем которого удалили
+     */
     @Delete(':userId')
     @UseGuards(AdminActivateGuard)
     async delete(@Param() param: { userId: string}){
