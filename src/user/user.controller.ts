@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpException, HttpStatus, Param, Patch, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpException, HttpStatus, Param, Patch, Put, Query, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { PaginationInput, UserInput, UserRoleEdit, UserStatusEdit } from './user.dto';
 import { AdminActivateGuard } from 'src/guards/admin-activate.guard';
@@ -10,8 +10,8 @@ export class UserController {
     /**
      * 
      * @param body описывает пользователя который будет создан
-     * @returns созданного пользователя
-     * @description решистрирует пользователей админом
+     * @returns возвращает созданного пользователя
+     * @description регистрирует пользователей админом
      */
     @Put()
     @HttpCode(202)
@@ -26,7 +26,7 @@ export class UserController {
     /**
      * 
      * @param param айдишник пользователя которого хочется найти
-     * @returns объект с пользователем 
+     * @returns возвращает объект с пользователем 
      */
     @Get(':userId')
     @UseGuards(AdminActivateGuard)
@@ -39,18 +39,18 @@ export class UserController {
     /**
      * 
      * @param pagination описывает курсорную пагинацию 
-     * @returns массив пользователей
+     * @returns возвращает массив пользователей
      */
     @Get('')
     @UseGuards(AdminActivateGuard)
-    async getAllUsers(@Body() pagination: PaginationInput){
-       return await this.userService.users(pagination.cursor, pagination.take); 
+    async getAllUsers(@Query() pagination: PaginationInput){
+       return await this.userService.users(parseInt(pagination.cursor) || undefined, parseInt(pagination.take) || undefined); 
     }
 
     /**
      * 
      * @param roleData в формате { role, email}, содерживает информацию по поводу новой роли для пользователя 
-     * @returns объект с пользователем с новой ролью 
+     * @returns возвращает объект с пользователем с новой ролью 
      */
     @Patch('editRole')
     @UseGuards(AdminActivateGuard)
@@ -61,7 +61,7 @@ export class UserController {
     /**
      * 
      * @param roleData в формате { role, email}, содерживает информацию по поводу нового статуса для пользователя 
-     * @returns объект с пользователем с новым статусом 
+     * @returns возвращает объект с пользователем с новым статусом 
      */
     @Patch('userStatus')
     @UseGuards(AdminActivateGuard)
@@ -72,7 +72,7 @@ export class UserController {
     /**
      * 
      * @param param айдишник пользователя которого хочется удалить
-     * @returns объект с пользователем которого удалили
+     * @returns возвращает объект с пользователем которого удалили
      */
     @Delete(':userId')
     @UseGuards(AdminActivateGuard)

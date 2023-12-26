@@ -5,7 +5,7 @@ import { AuthController } from './auth/auth.controller';
 import { UserController } from './user/user.controller';
 import { NewsController } from './news/news.controller';
 import { TokenService } from './token/token.service';
-import { PrismaService } from './prisma.service';
+import { PrismaService } from './prisma/prisma.service';
 import { UserService } from './user/user.service';
 import { CodesService } from './codes/codes.service';
 import { ScheduleModule } from '@nestjs/schedule';

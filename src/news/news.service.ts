@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
-import { PrismaService } from "src/prisma.service";
+import { PrismaService } from "src/prisma/prisma.service";
 import { NewsInputDto, NewsModificationDto, NewsPagination } from "./news.dto";
+import { NewsStatus } from "@prisma/client";
 
 const MAX_TAKE = 100;
 
@@ -8,11 +9,13 @@ const MAX_TAKE = 100;
 export class NewsService {
     constructor(private prisma: PrismaService) { }
 
-    async getNews(pagination: NewsPagination) {
-        let { page = 0, take = MAX_TAKE } = pagination;
+    async getNews(page = 0, take = MAX_TAKE) {
         if (take > MAX_TAKE) take = MAX_TAKE
         return await this.prisma.news.findMany({
-            skip: page * MAX_TAKE,
+            where: {
+                status: NewsStatus.published
+            },
+            skip: page * take,
             take
         });
     }
@@ -41,7 +44,7 @@ export class NewsService {
         try {
             return await this.prisma.news.delete({ where: { id } });
         } catch (e) {
-            if (e.code === 'P2025') throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+            if (e.code === 'P2025') throw new HttpException('News not found', HttpStatus.NOT_FOUND);
             throw e;
         }
     }
@@ -50,7 +53,7 @@ export class NewsService {
         try {
             const modified = await this.prisma.news.update({ where: { id }, data })
         } catch (e) {
-            if (e.code === 'P2025') throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+            if (e.code === 'P2025') throw new HttpException('News not found', HttpStatus.NOT_FOUND);
             throw e;
         }
     }

@@ -15,6 +15,7 @@ describe('TokenService', () => {
 
   it('Ciphered token with private key should be verified with public key', () => {
     const payload = {
+      id: 1,
       email: '1@2',
       name: '1',
       role: UserRole.user

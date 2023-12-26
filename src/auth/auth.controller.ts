@@ -12,7 +12,7 @@ export class AuthController {
     /**
      * 
      * @param body в формате { email, password }, используется для автентификации пользователя 
-     * @returns только 200 код, и герирует код для авторизации, который система пишет в терминале. Он позже используется для получения токена
+     * @returns возвращает только 200 код, и герирует код для авторизации, который система пишет в терминале. Он позже используется для получения токена
      */
     @Post('auth')
     async auth(@Body() body: AuthBodyDto) {
@@ -24,7 +24,7 @@ export class AuthController {
     /**
      * 
      * @param body в формате { email, password, code }, используется для получения токена после его генерирования
-     * @returns два токена, обновления (refresh) и доступа (обычный)
+     * @returns возвращает два токена, обновления (refresh) и доступа (обычный). Токен доступа имеет срок 1 часа, а токен обновления 1 дня
      */
     @Post('token')
     async token(@Body() body: TokenBodyDto): Promise<IToken> {
@@ -36,7 +36,7 @@ export class AuthController {
     /**
      * 
      * @param body в формате { refresh, email } чтобы  получинть новый токен используя токен обновленя 
-     * @returns возвращвет новый токен достуна
+     * @returns возвращает новый токен достуна
      */
     @Post('refresh')
     async refresh(@Body() body: RefreshBodyDto): Promise<IToken> {

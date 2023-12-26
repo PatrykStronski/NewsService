@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Put, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Put, Query, Req, UseGuards } from '@nestjs/common';
 import { NewsService } from './news.service';
 import { ModeratorActivateGuard } from 'src/guards/moderator-activate-guard';
 import { NewsInputDto, NewsModificationDto, NewsPagination } from './news.dto';
@@ -14,7 +14,7 @@ export class NewsController {
      * 
      * @param news содерживает в себе информацию про новость которая будет создана
      * @param request это объект запроса из которого выделяется АйДишник пользователя
-     * @returns созданный объект
+     * @returns возвращает созданный объект
      */
     @Put()
     @HttpCode(202)
@@ -28,18 +28,18 @@ export class NewsController {
     /**
      * 
      * @param pagination необязательный объект пагинации 
-     * @returns массив пользователей
+     * @returns возвращает массив пользователей
      */
-    @Get()
+    @Get('all')
     @UseGuards(UserActivateGuard)
-    async getAllNews(@Body() pagination: NewsPagination) {
-        return this.newsService.getNews(pagination);
+    async getAllNews(@Query() pagination: NewsPagination) {
+        return this.newsService.getNews(parseInt(pagination.page) || undefined, parseInt(pagination.take) || undefined);
     }
     
     /**
      * 
      * @param param параметр определяющий айдищник новости которую хочется получить
-     * @returns новость по айдишнику
+     * @returns возвращает новость по айдишнику
      */
     @Get(':newsId')
     @UseGuards(UserActivateGuard)
@@ -51,7 +51,7 @@ export class NewsController {
      * 
      * @param param параметр определяющий айдищник новости которую хочется модифицировать
      * @param modification объект содержающий модификации для новости. Все его ключи необязательны
-     * @returns модифицированную новость
+     * @returns возвращает модифицированную новость
      */
     @Patch(':newsId')
     @UseGuards(ModeratorActivateGuard)
@@ -63,7 +63,7 @@ export class NewsController {
     /**
      * 
      * @param param параметр определяющий айдищник новости которую хочется удалить
-     * @returns новость которая была удаленной 
+     * @returns возвращает новость которая была удаленной 
      */
     @Delete(':newsId')
     @UseGuards(ModeratorActivateGuard)

@@ -1,7 +1,7 @@
 import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import moment from 'moment';
-import { PrismaService } from 'src/prisma.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 const MAX_OTPS_PER_USER = 5;
 const CODE_VALIDITY_SECONDS = 120;

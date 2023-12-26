@@ -12,7 +12,7 @@ export class TokenService {
     createTokens(payload: IPayload): IToken {
         try {
             const token = jwt.sign({ ...payload, type: TokenType.standard }, this.privateKey, { algorithm: 'RS256', expiresIn: '1h' });
-            const refresh = jwt.sign({ email: payload.email, type: TokenType.refresh }, this.privateKey, { algorithm: 'RS256', expiresIn: '1d' });
+            const refresh = jwt.sign({ ...payload, type: TokenType.refresh }, this.privateKey, { algorithm: 'RS256', expiresIn: '1d' });
             return { token, refresh };
         } catch (e) {
             console.error(e);
@@ -23,16 +23,16 @@ export class TokenService {
     refreshToken(refresh: string, email: string): IToken {
         let payload;
         try {
-        payload = jwt.verify(refresh, this.privateKey) as IPayload;
+            payload = jwt.verify(refresh, this.privateKey) as IPayload;
         } catch (e) {
             console.error(e);
-            throw new UnauthorizedException({ message: 'Unable to verify refresh token'})
+            throw new UnauthorizedException({ message: 'Unable to verify refresh token' })
         }
         if (payload.email !== email) {
             throw new UnauthorizedException({ message: 'Email in payload and body not matching' });
         }
         try {
-            const token = jwt.sign({ email: payload.email, name: payload.name, role: payload.role }, this.privateKey, { algorithm: 'RS256', expiresIn: '1h' });
+            const token = jwt.sign({ email: payload.email, name: payload.name, role: payload.role, id: payload.id }, this.privateKey, { algorithm: 'RS256', expiresIn: '1h' });
             return {
                 token
             }

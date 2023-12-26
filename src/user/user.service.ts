@@ -2,7 +2,7 @@ import { BadRequestException, ForbiddenException, HttpException, HttpStatus, Inj
 import { genSalt, hash, compare } from 'bcrypt';
 import { AuthBodyDto } from "src/auth/auth.dto";
 import { UserInput, UserRoleEdit, UserStatusEdit } from "./user.dto";
-import { PrismaService } from "src/prisma.service";
+import { PrismaService } from "src/prisma/prisma.service";
 import { User, UserStatus } from "@prisma/client";
 import { IPayload } from "src/token/token.model";
 

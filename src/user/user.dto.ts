@@ -35,11 +35,9 @@ export class UserStatusEdit {
 }
 
 export class PaginationInput {
-    @IsPositive()
     @IsOptional()
-    cursor?: number;
+    cursor?: string;
 
-    @IsPositive()
     @IsOptional()
-    take?: number;
+    take?: string;
 }

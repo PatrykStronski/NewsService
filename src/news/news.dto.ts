@@ -34,11 +34,9 @@ export class NewsModificationDto {
 }
 
 export class NewsPagination {
-    @IsPositive()
     @IsOptional()
-    page: number;
+    page: string;
 
-    @IsPositive()
     @IsOptional()
-    take: number;
+    take: string;
 }
